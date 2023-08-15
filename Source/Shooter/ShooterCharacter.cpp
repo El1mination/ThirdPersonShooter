@@ -94,8 +94,12 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	{
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AShooterCharacter::MoveForward);
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AShooterCharacter::MoveRight);
-		EnhancedInputComponent->BindAction(TurnRate, ETriggerEvent::Triggered, this, &AShooterCharacter::TurnAtRate);
-		EnhancedInputComponent->BindAction(LookUpRate, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUpAtRate);
+		EnhancedInputComponent->BindAction(TurnRateAction, ETriggerEvent::Triggered, this, &AShooterCharacter::TurnAtRate);
+		EnhancedInputComponent->BindAction(LookUpRateAction, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUpAtRate);
+		//EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &APawn::AddControllerYawInput);
+		//EnhancedInputComponent->BindAction(LookUpAction, ETriggerEvent::Triggered, this, &APawn::AddControllerPitchInput);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpReleaseAction, ETriggerEvent::Triggered, this, &ACharacter::StopJumping);
 	}
 
 }
