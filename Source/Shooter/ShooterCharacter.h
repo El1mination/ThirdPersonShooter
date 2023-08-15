@@ -23,9 +23,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	/** Movement */
 	void MoveForward(const FInputActionValue& Value);
 	void MoveRight(const FInputActionValue& Value);
+	void TurnAtRate(const FInputActionValue& Value);
+	void LookUpAtRate(const FInputActionValue& Value);
 
+	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* CharacterMappingContext;
 
@@ -35,6 +39,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* MoveRightAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* TurnRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* LookUpRate;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -42,6 +52,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	float BaseTurnRate = 45.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	float BaseLookUpRate = 45.f;
 
 public:
 

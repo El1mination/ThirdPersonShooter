@@ -64,6 +64,20 @@ void AShooterCharacter::MoveRight(const FInputActionValue& Value)
 	}
 }
 
+void AShooterCharacter::TurnAtRate(const FInputActionValue& Value)
+{
+	const float Currentvalue = Value.Get<float>();
+
+	AddControllerYawInput(Currentvalue * BaseTurnRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AShooterCharacter::LookUpAtRate(const FInputActionValue& Value)
+{
+	const float Currentvalue = Value.Get<float>();
+
+	AddControllerPitchInput(Currentvalue * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -80,6 +94,8 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	{
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AShooterCharacter::MoveForward);
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AShooterCharacter::MoveRight);
+		EnhancedInputComponent->BindAction(TurnRate, ETriggerEvent::Triggered, this, &AShooterCharacter::TurnAtRate);
+		EnhancedInputComponent->BindAction(LookUpRate, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUpAtRate);
 	}
 
 }
