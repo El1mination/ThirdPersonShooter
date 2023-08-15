@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "ShooterCharacter.generated.h"
+
+class UInputMappingContext;
+class UInputAction;
 
 UCLASS()
 class SHOOTER_API AShooterCharacter : public ACharacter
@@ -18,6 +22,18 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	void MoveForward(const FInputActionValue& Value);
+	void MoveRight(const FInputActionValue& Value);
+
+	UPROPERTY(EditAnywhere, Category = "Input")
+	UInputMappingContext* CharacterMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintreadOnly, Category = "Input")
+	UInputAction* MoveForwardAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* MoveRightAction;
 
 private:
 
