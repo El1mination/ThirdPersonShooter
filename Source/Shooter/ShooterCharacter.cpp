@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "DrawDebugHelpers.h"
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -100,14 +101,31 @@ void AShooterCharacter::FireWeapon()
 		UGameplayStatics::PlaySound2D(this, FireSound);
 	}
 
-	// Play Muzzle Flash Effect
 	const USkeletalMeshSocket* BarrelSocket = GetMesh()->GetSocketByName("BarrelSocket");
 	if (BarrelSocket)
 	{
-		const FTransform SocketTransfrom = BarrelSocket->GetSocketTransform(GetMesh()); // Barrel Socket Transform
+		// Play Muzzle Flash Effect
+		const FTransform SocketTransform = BarrelSocket->GetSocketTransform(GetMesh()); // Barrel Socket Transform
 		if (MuzzleFlash)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransfrom);
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
+		}
+
+		// Line Trarce
+		FHitResult FireHit;
+		const FVector Start{ SocketTransform.GetLocation() };
+
+		// Gets X Axis on the BarrelSocket (Forward Direction)
+		const FQuat Rotation{ SocketTransform.GetRotation() }; // Rotation of Start
+		const FVector RotationAxis{ Rotation.GetAxisX() };
+
+		const FVector End{ Start + RotationAxis * 50'000.f }; // End = Start + Forward Direction * 50'000 units
+
+		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
+		if (FireHit.bBlockingHit)
+		{
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, true);
+			DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Emerald, true);
 		}
 	}
 
