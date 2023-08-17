@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
+#include "Particles/ParticleSystemComponent.h"
 
 AShooterCharacter::AShooterCharacter()
 {
@@ -121,11 +122,24 @@ void AShooterCharacter::FireWeapon()
 
 		const FVector End{ Start + RotationAxis * 50'000.f }; // End = Start + Forward Direction * 50'000 units
 
+		FVector BeamEndPoint{ End }; // BeamEndPoint is originally initialized to the length of the LineTrace from the BarrelSocket to 50'000 units forward
+
 		GetWorld()->LineTraceSingleByChannel(FireHit, Start, End, ECollisionChannel::ECC_Visibility);
 		if (FireHit.bBlockingHit)
 		{
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, true);
-			DrawDebugPoint(GetWorld(), FireHit.Location, 5.f, FColor::Emerald, true);
+			BeamEndPoint = FireHit.Location; // If BeamEndPoint hits an object, it is initialized to the location of FireHit.Location
+
+			// Spawn Impact Particles at Hit Location
+			if (ImpactParticles)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, FireHit.Location);
+			}
+		}
+
+		if (BeamParticles)
+		{
+			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform);
+			Beam->SetVectorParameter(FName("Target"), BeamEndPoint); // Changes Beams End Location (Target) to the BeamEndPoint, shoots beam from SocketTransform to BeandEndPoint
 		}
 	}
 
