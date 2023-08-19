@@ -113,6 +113,52 @@ void AShooterCharacter::FireWeapon()
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), MuzzleFlash, SocketTransform);
 		}
 
+		// Get Viewport
+		FVector2D ViewportSize;
+		if (GEngine && GEngine->GameViewport)
+		{
+			GEngine->GameViewport->GetViewportSize(ViewportSize);
+		}
+
+		// Get Crosshair Location
+		FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+		CrosshairLocation.Y -= 50.f; // Raises Crosshair By 50 Units
+
+		// Project The Crosshair From Screen Space to Word Space and Fills Variables With Info
+		FVector CrosshairWorldPosition;
+		FVector CrosshairWorldDirection;
+		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(UGameplayStatics::GetPlayerController(this, 0), CrosshairLocation, CrosshairWorldPosition, CrosshairWorldDirection);
+		
+		if (bScreenToWorld)
+		{
+			FHitResult ScreenTraceHit;
+			const FVector Start{ CrosshairWorldPosition }; // Start is at Crosshair Position
+			const FVector End{ CrosshairWorldPosition + CrosshairWorldDirection * 50'000 }; // End is Crosshair Position 50'000 Units Forward In The Direction Of Crosshair World Direction
+
+			FVector BeamEndPoint{ End }; // BeamEnd is originially Set to End in Case Line Trace Never Hits Anything
+
+			GetWorld()->LineTraceSingleByChannel(ScreenTraceHit, Start, End, ECollisionChannel::ECC_Visibility);
+
+			if (ScreenTraceHit.bBlockingHit)
+			{
+				// Sets BeamEndPoint to HitLocation and Spawn Beam Particles
+				BeamEndPoint = ScreenTraceHit.Location;
+				if (BeamParticles)
+				{
+					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);
+				}
+			}
+			if (BeamParticles)
+			{
+				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform); // Beam Starts At SocketTransform
+				if (Beam)
+				{
+					Beam->SetVectorParameter(FName("Target"), BeamEndPoint); // Changes Beams End Location (Target) to the BeamEndPoint, shoots beam from SocketTransform to BeandEndPoint
+				}
+			}
+		}
+
+		/*
 		// Line Trarce
 		FHitResult FireHit;
 		const FVector Start{ SocketTransform.GetLocation() };
@@ -141,7 +187,7 @@ void AShooterCharacter::FireWeapon()
 		{
 			UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform);
 			Beam->SetVectorParameter(FName("Target"), BeamEndPoint); // Changes Beams End Location (Target) to the BeamEndPoint, shoots beam from SocketTransform to BeandEndPoint
-		}
+		}*/
 	}
 
 	// Play Fire Montage
