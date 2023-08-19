@@ -36,7 +36,7 @@ AShooterCharacter::AShooterCharacter()
 	/** Character Movement  */
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f); // Character Moves In Direction of Input
-	GetCharacterMovement()->JumpZVelocity = 350.f;
+	GetCharacterMovement()->JumpZVelocity = 450.f;
 	GetCharacterMovement()->AirControl = 0.1f;
 }
 
@@ -141,13 +141,28 @@ void AShooterCharacter::FireWeapon()
 
 			if (ScreenTraceHit.bBlockingHit)
 			{
-				// Sets BeamEndPoint to HitLocation and Spawn Beam Particles
+				// Sets BeamEndPoint to HitLocation
 				BeamEndPoint = ScreenTraceHit.Location;
-				if (BeamParticles)
-				{
-					UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, ScreenTraceHit.Location);
-				}
 			}
+
+			// Perform a Second Trace From Gun Barrel
+			FHitResult WeaponTraceHit;
+			const FVector WeaponTraceStart{ SocketTransform.GetLocation() };
+			const FVector WeaponTraceEnd{ BeamEndPoint };
+			GetWorld()->LineTraceSingleByChannel(WeaponTraceHit, WeaponTraceStart, WeaponTraceEnd, ECollisionChannel::ECC_Visibility);
+
+			// If Object Between Barrel and BeamEndPoint, Set BeamEndPoint to Object Hit by Barrel Trace
+			if (WeaponTraceHit.bBlockingHit)
+			{
+				BeamEndPoint = WeaponTraceHit.Location;
+			}
+
+			// Spawn Impact Particles After Updating BeamEndpoint
+			if (BeamParticles)
+			{
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, BeamEndPoint);
+			}
+
 			if (BeamParticles)
 			{
 				UParticleSystemComponent* Beam = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), BeamParticles, SocketTransform); // Beam Starts At SocketTransform
