@@ -29,6 +29,7 @@ protected:
 	void TurnAtRate(const FInputActionValue& Value);
 	void LookUpAtRate(const FInputActionValue& Value);
 	void FireWeapon();
+	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 
 	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
