@@ -32,6 +32,7 @@ protected:
 	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 	void AimingButtonPressed();
 	void AimingButtonReleased();
+	void CameraInterpZoom(float DeltaTime);
 
 	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -110,12 +111,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	bool bAiming;
 
-	// Camera FOV by Default
-	float CameraDefaultFOV;
+	float CameraDefaultFOV; // Camera FOV by Default
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	// Cameras Zoomed FOV
-	float CameraZoomedFOV;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float CameraZoomedFOV; // Cameras Zoomed FOV
+
+	float CameraCurrentFOV; // Current Field OF View This Frame
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	float ZoomInterpSpeed;
 
 public:
 
