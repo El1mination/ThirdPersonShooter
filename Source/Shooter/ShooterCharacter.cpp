@@ -14,9 +14,16 @@
 #include "Particles/ParticleSystemComponent.h"
 
 AShooterCharacter::AShooterCharacter() :
+	// Base Rates For Turning/Looking Up
 	BaseTurnRate(45.f),
 	BaseLookUpRate(45.f),
+	// Aiming/Not Aiming Rates
+	HipTurnRate(90.f),
+	HipLookUpRate(90.f),
+	AimingTurnRate(20.f),
+	AimingLookUpRate(20.f),
 	bAiming(false),
+	// Camera FOV Values
 	CameraDefaultFOV(0.f),
 	CameraZoomedFOV(35.f),
 	CameraCurrentFOV(0.f),
@@ -106,6 +113,18 @@ void AShooterCharacter::LookUpAtRate(const FInputActionValue& Value)
 	const float Currentvalue = Value.Get<float>();
 
 	AddControllerPitchInput(Currentvalue * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void AShooterCharacter::Turn(const FInputActionValue& Value)
+{
+	const float CurrentValue = Value.Get<float>();
+
+}
+
+void AShooterCharacter::LookUp(const FInputActionValue& Value)
+{
+	const float CurrentValue = Value.Get<float>();
+
 }
 
 void AShooterCharacter::FireWeapon()
@@ -236,11 +255,29 @@ void AShooterCharacter::CameraInterpZoom(float DeltaTime)
 	GetFollowCamera()->SetFieldOfView(CameraCurrentFOV); // Set Camera FOV to CameraCurrentFOV
 }
 
+void AShooterCharacter::SetLookRates()
+{
+	if (bAiming)
+	{
+		// If Aiming, Set Base Rates to Aiming Rates
+		BaseTurnRate = AimingTurnRate;
+		BaseLookUpRate = AimingLookUpRate;
+	}
+	else
+	{
+		// If Not Aiming, Set Base Rates to Hip Rates
+		BaseTurnRate = HipTurnRate;
+		BaseLookUpRate = HipLookUpRate;
+	}
+}
+
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	CameraInterpZoom(DeltaTime); // Interps Zoom Based on If Aiming or Not
+	SetLookRates(); // Set BaseTurnRate and BaseLookUpRate Based on aiming
+	
 }
 
 void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -251,18 +288,23 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	/** Cast PlayerInputComponent to EnhancedInputComponent */
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		/** Movement */
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AShooterCharacter::MoveForward);
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AShooterCharacter::MoveRight);
-		EnhancedInputComponent->BindAction(TurnRateAction, ETriggerEvent::Triggered, this, &AShooterCharacter::TurnAtRate);
-		EnhancedInputComponent->BindAction(LookUpRateAction, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUpAtRate);
-		//EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &APawn::AddControllerYawInput);
-		//EnhancedInputComponent->BindAction(LookUpAction, ETriggerEvent::Triggered, this, &APawn::AddControllerPitchInput);
 
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpReleaseAction, ETriggerEvent::Triggered, this, &ACharacter::StopJumping);
 
-		EnhancedInputComponent->BindAction(FireWeaponAction, ETriggerEvent::Triggered, this, &AShooterCharacter::FireWeapon);
+		/** Contrtoller */
+		EnhancedInputComponent->BindAction(TurnRateAction, ETriggerEvent::Triggered, this, &AShooterCharacter::TurnAtRate);
+		EnhancedInputComponent->BindAction(LookUpRateAction, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUpAtRate);
 
+		/** Mouse */
+		EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &AShooterCharacter::Turn);
+		EnhancedInputComponent->BindAction(LookUpAction, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUp);
+
+		/** Weapon/Aiming */
+		EnhancedInputComponent->BindAction(FireWeaponAction, ETriggerEvent::Triggered, this, &AShooterCharacter::FireWeapon);
 		EnhancedInputComponent->BindAction(AimPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimingButtonPressed);
 		EnhancedInputComponent->BindAction(AimReleasedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimingButtonReleased);
 	}

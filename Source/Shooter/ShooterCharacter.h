@@ -26,13 +26,22 @@ protected:
 	/** Movement */
 	void MoveForward(const FInputActionValue& Value);
 	void MoveRight(const FInputActionValue& Value);
+
+	/** Controller */
 	void TurnAtRate(const FInputActionValue& Value);
 	void LookUpAtRate(const FInputActionValue& Value);
+
+	/** Mouse */
+	void Turn(const FInputActionValue& Value);
+	void LookUp(const FInputActionValue& Value);
+
+	/** Weapon */
 	void FireWeapon();
 	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
 	void AimingButtonPressed();
 	void AimingButtonReleased();
 	void CameraInterpZoom(float DeltaTime);
+	void SetLookRates(); // Set Turn and LookUp Rate Based on Aiming
 
 	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -85,6 +94,20 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float BaseLookUpRate;
 
+	// While Not Aiming
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float HipTurnRate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float HipLookUpRate;
+
+	// While Aiming
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float AimingTurnRate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float AimingLookUpRate;
+
 	/** Animations */
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
@@ -106,7 +129,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* BeamParticles;
 
-	/** Weapon */
+	/** Aiming */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	bool bAiming;
