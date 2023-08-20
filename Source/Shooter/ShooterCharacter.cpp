@@ -13,7 +13,12 @@
 #include "DrawDebugHelpers.h"
 #include "Particles/ParticleSystemComponent.h"
 
-AShooterCharacter::AShooterCharacter()
+AShooterCharacter::AShooterCharacter() :
+	BaseTurnRate(45.f),
+	BaseLookUpRate(45.f),
+	bAiming(false),
+	CameraDefaultFOV(0.f),
+	CameraZoomedFOV(60.f)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -50,7 +55,12 @@ void AShooterCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(CharacterMappingContext, 0);
 		}
-	}	
+	}
+
+	if (FollowCamera)
+	{
+		CameraDefaultFOV = GetFollowCamera()->FieldOfView; //CameraDefaultFOv set to Cameras Default FOV
+	}
 }
 
 void AShooterCharacter::MoveForward(const FInputActionValue& Value)
@@ -196,6 +206,20 @@ bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, 
 	return false; // If Deprojection Doesn't Work, Return False
 }
 
+void AShooterCharacter::AimingButtonPressed()
+{
+	bAiming = true;
+	GetFollowCamera()->SetFieldOfView(CameraZoomedFOV);
+	UE_LOG(LogTemp, Warning, TEXT("Pressed"));
+}
+
+void AShooterCharacter::AimingButtonReleased()
+{
+	bAiming = false;
+	GetFollowCamera()->SetFieldOfView(CameraDefaultFOV);
+	UE_LOG(LogTemp, Warning, TEXT("Released"));
+}
+
 void AShooterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -216,9 +240,14 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookUpRateAction, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUpAtRate);
 		//EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &APawn::AddControllerYawInput);
 		//EnhancedInputComponent->BindAction(LookUpAction, ETriggerEvent::Triggered, this, &APawn::AddControllerPitchInput);
+
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpReleaseAction, ETriggerEvent::Triggered, this, &ACharacter::StopJumping);
+
 		EnhancedInputComponent->BindAction(FireWeaponAction, ETriggerEvent::Triggered, this, &AShooterCharacter::FireWeapon);
+
+		EnhancedInputComponent->BindAction(AimPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimingButtonPressed);
+		EnhancedInputComponent->BindAction(AimReleasedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimingButtonReleased);
 	}
 
 }

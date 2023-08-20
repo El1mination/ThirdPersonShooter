@@ -30,6 +30,8 @@ protected:
 	void LookUpAtRate(const FInputActionValue& Value);
 	void FireWeapon();
 	bool GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation);
+	void AimingButtonPressed();
+	void AimingButtonReleased();
 
 	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -62,6 +64,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* FireWeaponAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* AimPressedAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* AimReleasedAction;
+
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -71,10 +79,10 @@ private:
 	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	float BaseTurnRate = 45.f;
+	float BaseTurnRate;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	float BaseLookUpRate = 45.f;
+	float BaseLookUpRate;
 
 	/** Animations */
 
@@ -96,6 +104,18 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* BeamParticles;
+
+	/** Weapon */
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	bool bAiming;
+
+	// Camera FOV by Default
+	float CameraDefaultFOV;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	// Cameras Zoomed FOV
+	float CameraZoomedFOV;
 
 public:
 
