@@ -37,4 +37,8 @@ private:
 	/** Offset Yaw Used For Strafing */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float MovementOffsetYaw;
+
+	/** Offset Yaw The Frame Before We Stopped Moving */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement", meta = (AllowPrivateAccess = "true"))
+	float LastMovementOffsetYaw;
 };

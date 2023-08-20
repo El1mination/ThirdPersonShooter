@@ -41,16 +41,12 @@ void UShooterAnimInstance::UpdateAnimationProperties(float DeltaTime)
 
 		// Gets Difference Between MovementRotation and AimRotation In The Yaw Direction and Stores as Float
 		MovementOffsetYaw = UKismetMathLibrary::NormalizedDeltaRotator(MovementRotation, AimRotation).Yaw; // Gets difference Between
-
-		/*FString RotationMessage = FString::Printf(TEXT("Base Aim Rotation %f"), AimRotation.Yaw);
-		if (GEngine) { GEngine->AddOnScreenDebugMessage(1, 0.f, FColor::Blue, RotationMessage); }*/
-
-		/*FString MovementRotationMessage = FString::Printf(TEXT("Base Movement Rotation %f"), MovementRotation.Yaw);
-		if (GEngine) { GEngine->AddOnScreenDebugMessage(2, 0.f, FColor::Blue, MovementRotationMessage); }*/
-
-		/*FString OffsetMessage = FString::Printf(TEXT("Movement Offset Yaw %f"), MovementOffsetYaw);
-		if (GEngine) { GEngine->AddOnScreenDebugMessage(2, 0.f, FColor::Blue, OffsetMessage); }*/
-
+		
+		// Sets LastMovementOffsetYaw to MovementOffsetYaw the Frame Before it is Set to 0
+		if (ShooterCharacter->GetVelocity().Size() > 0.f)
+		{
+			LastMovementOffsetYaw = MovementOffsetYaw;
+		}
 	}
 }
 
