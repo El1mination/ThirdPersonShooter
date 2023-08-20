@@ -17,11 +17,17 @@ AShooterCharacter::AShooterCharacter() :
 	// Base Rates For Turning/Looking Up
 	BaseTurnRate(45.f),
 	BaseLookUpRate(45.f),
-	// Aiming/Not Aiming Rates
+	// Aiming/Not Aiming Rates (Controller)
 	HipTurnRate(90.f),
 	HipLookUpRate(90.f),
 	AimingTurnRate(20.f),
 	AimingLookUpRate(20.f),
+	// Aiming/Not Aiming Rates (Mouse)
+	MouseHipTurnRate(1.f),
+	MouseHipLookUpRate(1.f),
+	MouseAimingTurnRate(0.2f),
+	MouseAimingLookUpRate(0.2f),
+	// True When Aiming Weapon
 	bAiming(false),
 	// Camera FOV Values
 	CameraDefaultFOV(0.f),
@@ -118,13 +124,33 @@ void AShooterCharacter::LookUpAtRate(const FInputActionValue& Value)
 void AShooterCharacter::Turn(const FInputActionValue& Value)
 {
 	const float CurrentValue = Value.Get<float>();
+	float TurnScaleFactor;
 
+	if (bAiming)
+	{
+		TurnScaleFactor = MouseAimingTurnRate; // When Aiming, TurnScaleFactor set to MouseAimingTurnRate
+	}
+	else
+	{
+		TurnScaleFactor = MouseHipTurnRate; // When Not Aiming, TurnScaleFactor set to MouseHipTurnRate
+	}
+	AddControllerYawInput(CurrentValue * TurnScaleFactor);
 }
 
 void AShooterCharacter::LookUp(const FInputActionValue& Value)
 {
 	const float CurrentValue = Value.Get<float>();
+	float LookUpScaleFactor;
 
+	if (bAiming)
+	{
+		LookUpScaleFactor = MouseAimingLookUpRate; // When Aiming, LookUpScaleFactor set to MouseAimingLookUpRate
+	}
+	else
+	{
+		LookUpScaleFactor = MouseHipLookUpRate; // When Not Aiming, LookUpScaleFactor set to MouseLookUpRate
+	}
+	AddControllerPitchInput(CurrentValue * LookUpScaleFactor);
 }
 
 void AShooterCharacter::FireWeapon()
