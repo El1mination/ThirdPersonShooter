@@ -317,6 +317,7 @@ void AShooterCharacter::Tick(float DeltaTime)
 
 	CameraInterpZoom(DeltaTime); // Interps Zoom Based on If Aiming or Not
 	SetLookRates(); // Set BaseTurnRate and BaseLookUpRate Based on aiming
+	CalculateCrosshairSpread(DeltaTime); // Calculate Crosshair Spread Multiplier
 	
 }
 
@@ -349,5 +350,10 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(AimReleasedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimingButtonReleased);
 	}
 
+}
+
+float AShooterCharacter::GetCrosshairSpreadMultiplier() const
+{
+	return CrosshairSpreadMultiplier;
 }
 
