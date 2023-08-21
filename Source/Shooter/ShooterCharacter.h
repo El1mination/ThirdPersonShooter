@@ -42,6 +42,7 @@ protected:
 	void AimingButtonReleased();
 	void CameraInterpZoom(float DeltaTime);
 	void SetLookRates(); // Set Turn and LookUp Rate Based on Aiming
+	void CalculateCrosshairSpread(float DeltaTime);
 
 	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -162,6 +163,23 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	float ZoomInterpSpeed;
+
+	/** Crosshairs */
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Crosshairs", meta = (AllowPrivateAccess = "true")) // Determines Spread Of Crosshairs
+	float CrosshairSpreadMultiplier;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshairs", meta = (AllowPrivateAccess = "true")) // Velocity Component For CrosshairSpread
+	float CrosshairVelocityFactor;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshairs", meta = (AllowPrivateAccess = "true")) // In Air Component For Crosshairs Spread
+	float CrosshairInAirFactor;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshairs", meta = (AllowPrivateAccess = "true")) // Aim Component For Crosshairs Spread
+	float CrosshairAimFactor;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshairs", meta = (AllowPrivateAccess = "true")) // Shooting Component For Crosshairs Spread
+	float CrosshairShootingFactor;
 
 public:
 
