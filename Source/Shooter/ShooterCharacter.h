@@ -44,6 +44,11 @@ protected:
 	void SetLookRates(); // Set Turn and LookUp Rate Based on Aiming
 	void CalculateCrosshairSpread(float DeltaTime);
 
+	void StartCrosshairBulletFire();
+
+	UFUNCTION()
+	void FinishCrosshairBulletFire();
+
 	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
 	UInputMappingContext* CharacterMappingContext;
@@ -180,6 +185,12 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Crosshairs", meta = (AllowPrivateAccess = "true")) // Shooting Component For Crosshairs Spread
 	float CrosshairShootingFactor;
+
+	float ShootTimeDuration;
+
+	bool bFiringBullet;
+
+	FTimerHandle CrosshairShootTimer;
 
 public:
 

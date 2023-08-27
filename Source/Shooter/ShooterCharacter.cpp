@@ -33,7 +33,16 @@ AShooterCharacter::AShooterCharacter() :
 	CameraDefaultFOV(0.f),
 	CameraZoomedFOV(35.f),
 	CameraCurrentFOV(0.f),
-	ZoomInterpSpeed(20.f)
+	ZoomInterpSpeed(20.f),
+	// Crosshair Spread Factors
+	CrosshairSpreadMultiplier(0.f),
+	CrosshairVelocityFactor(0.f),
+	CrosshairInAirFactor(0.f),
+	CrosshairAimFactor(0.f),
+	CrosshairShootingFactor(0.f),
+	// Bullet Fire Timer Variables
+	ShootTimeDuration(0.05f),
+	bFiringBullet(false)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -200,6 +209,9 @@ void AShooterCharacter::FireWeapon()
 		AnimInstance->Montage_Play(HipFireMontage);
 		AnimInstance->Montage_JumpToSection(FName("StartFire"));
 	}
+
+	// Start Bullet Fire Timer For Crosshairs
+	StartCrosshairBulletFire();
 }
 
 bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, FVector& OutBeamLocation)
@@ -338,8 +350,32 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 	}
 
 	/** Bullet Fire Aim Factor */
+	
+	// Checks If Firing Bullet
+	if (bFiringBullet)
+	{
+		// Spreads Crosshairs Very Fast While Shooting
+		CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.3f, DeltaTime, 60.f);
+	}
+	else
+	{
+		// Shrinks Crosshairs Very Fast After Shooting Timer Ends (0.05 Seconds)
+		CrosshairShootingFactor = FMath::FInterpTo(CrosshairShootingFactor, 0.f, DeltaTime, 15.f);
+	}
 
-	CrosshairSpreadMultiplier = 0.5 + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor;
+	CrosshairSpreadMultiplier = 0.5 + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor + CrosshairShootingFactor;
+}
+
+void AShooterCharacter::StartCrosshairBulletFire()
+{
+	bFiringBullet = true;
+
+	GetWorldTimerManager().SetTimer(CrosshairShootTimer, this, &AShooterCharacter::FinishCrosshairBulletFire, ShootTimeDuration);
+}
+
+void AShooterCharacter::FinishCrosshairBulletFire()
+{
+	bFiringBullet = false;
 }
 
 void AShooterCharacter::Tick(float DeltaTime)
