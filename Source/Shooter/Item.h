@@ -19,6 +19,14 @@ protected:
 	virtual void BeginPlay() override;
 
 private:	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	USkeletalMeshComponent* ItemMesh;
+
+	/** Line Trace Collides With Box To Show HUD Widgets */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item Properties", meta = (AllowPrivateAccess = "true"))
+	class UBoxComponent* CollisionBox;
 	
+public:
 
 };
