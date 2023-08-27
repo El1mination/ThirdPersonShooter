@@ -43,11 +43,18 @@ protected:
 	void CameraInterpZoom(float DeltaTime);
 	void SetLookRates(); // Set Turn and LookUp Rate Based on Aiming
 	void CalculateCrosshairSpread(float DeltaTime);
+	void FireButtonPressed();
+	void FireButtonReleased();
 
 	void StartCrosshairBulletFire();
 
+	void StartFireTimer();
+
 	UFUNCTION()
 	void FinishCrosshairBulletFire();
+
+	UFUNCTION()
+	void AutoFireReset();
 
 	/** Input Contexts and Actions */
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -78,7 +85,10 @@ protected:
 	UInputAction* JumpReleaseAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
-	UInputAction* FireWeaponAction;
+	UInputAction* FireWeaponPressedAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	UInputAction* FireWeaponReleasedAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	UInputAction* AimPressedAction;
@@ -191,6 +201,20 @@ private:
 	bool bFiringBullet;
 
 	FTimerHandle CrosshairShootTimer;
+
+	/** Weapon */
+
+	// Right Trigger Pressed
+	bool bFireButtonPressed;
+
+	// True When We Can Fire, False While Waiting For Timer
+	bool bShouldFire;
+
+	// Rate Of Automatic Gun Timer
+	float AutomaticFireRate;
+
+	/** Sets A Timer Between Gunshots */
+	FTimerHandle AutoFireTimer;
 
 public:
 

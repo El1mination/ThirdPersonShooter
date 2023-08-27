@@ -42,7 +42,12 @@ AShooterCharacter::AShooterCharacter() :
 	CrosshairShootingFactor(0.f),
 	// Bullet Fire Timer Variables
 	ShootTimeDuration(0.05f),
-	bFiringBullet(false)
+	bFiringBullet(false),
+	// Automatic Fire Variables
+	AutomaticFireRate(0.1f),
+	bShouldFire(true),
+	bFireButtonPressed(false)
+
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -225,7 +230,7 @@ bool AShooterCharacter::GetBeamEndLocation(const FVector& MuzzleSocketLocation, 
 
 	// Get Crosshair Location
 	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
-	CrosshairLocation.Y -= 50.f; // Raises Crosshair By 50 Units
+	//CrosshairLocation.Y -= 50.f; // Raises Crosshair By 50 Units
 
 	// Project The Crosshair From Screen Space to World Space and Fills Variables With Info
 	FVector CrosshairWorldPosition;
@@ -368,14 +373,46 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 
 void AShooterCharacter::StartCrosshairBulletFire()
 {
+	// Bullet Fire Time For Crosshairs
 	bFiringBullet = true;
-
 	GetWorldTimerManager().SetTimer(CrosshairShootTimer, this, &AShooterCharacter::FinishCrosshairBulletFire, ShootTimeDuration);
 }
 
 void AShooterCharacter::FinishCrosshairBulletFire()
 {
 	bFiringBullet = false;
+}
+
+void AShooterCharacter::StartFireTimer()
+{
+	if (bShouldFire)
+	{
+		// Fire Weapon, Set bShouldFire to False, Set Timer With AutoFireReset As Callback (Sets bShouldFire to True)
+		FireWeapon();
+		bShouldFire = false;
+		GetWorldTimerManager().SetTimer(AutoFireTimer, this, &AShooterCharacter::AutoFireReset, AutomaticFireRate);
+	}
+}
+
+void AShooterCharacter::AutoFireReset()
+{
+	// Sets bShouldFire to True and Calls StartFireTimer if bFireButtonPressed is Still Being Pressed Which Creates A Firing Loop
+	bShouldFire = true;
+	if (bFireButtonPressed)
+	{
+		StartFireTimer();
+	}
+}
+
+void AShooterCharacter::FireButtonPressed()
+{
+	bFireButtonPressed = true;
+	StartFireTimer();
+}
+
+void AShooterCharacter::FireButtonReleased()
+{
+	bFireButtonPressed = false;
 }
 
 void AShooterCharacter::Tick(float DeltaTime)
@@ -412,7 +449,9 @@ void AShooterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookUpAction, ETriggerEvent::Triggered, this, &AShooterCharacter::LookUp);
 
 		/** Weapon/Aiming */
-		EnhancedInputComponent->BindAction(FireWeaponAction, ETriggerEvent::Triggered, this, &AShooterCharacter::FireWeapon);
+		EnhancedInputComponent->BindAction(FireWeaponPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::FireButtonPressed);
+		EnhancedInputComponent->BindAction(FireWeaponReleasedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::FireButtonReleased);
+
 		EnhancedInputComponent->BindAction(AimPressedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimingButtonPressed);
 		EnhancedInputComponent->BindAction(AimReleasedAction, ETriggerEvent::Triggered, this, &AShooterCharacter::AimingButtonReleased);
 	}
