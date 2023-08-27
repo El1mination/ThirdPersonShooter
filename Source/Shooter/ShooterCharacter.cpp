@@ -320,11 +320,26 @@ void AShooterCharacter::CalculateCrosshairSpread(float DeltaTime)
 	}
 	else
 	{
-		// Close Crosshairs Quickly After Hitting Ground
+		// Shrink Crosshairs Quickly After Hitting Ground
 		CrosshairInAirFactor = FMath::FInterpTo(CrosshairInAirFactor, 0.f, DeltaTime, 30.f);
 	}
 
-	CrosshairSpreadMultiplier = 0.5 + CrosshairVelocityFactor + CrosshairInAirFactor;
+	/** Crosshair Aim Factor */
+
+	if (bAiming)
+	{
+		// Shrink Crosshairs Fast While Aiming
+		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.35, DeltaTime, 30.f);
+	}
+	else
+	{
+		// Spread Crosshairs Fast While Not Aiming
+		CrosshairAimFactor = FMath::FInterpTo(CrosshairAimFactor, 0.f, DeltaTime, 30.f);
+	}
+
+	/** Bullet Fire Aim Factor */
+
+	CrosshairSpreadMultiplier = 0.5 + CrosshairVelocityFactor + CrosshairInAirFactor - CrosshairAimFactor;
 }
 
 void AShooterCharacter::Tick(float DeltaTime)
